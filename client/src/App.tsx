@@ -6,6 +6,7 @@ import QuizDashboard from './pages/QuizDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -55,12 +56,12 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<CoursesPage />} />
-        <Route path="/progress" element={<ProgressPage />} />
-        <Route path="/quizzes" element={<QuizDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+        <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+        <Route path="/quizzes" element={<ProtectedRoute><QuizDashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
