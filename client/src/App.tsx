@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import CoursesPage from './pages/CoursesPage';
 import ProgressPage from './pages/ProgressPage';
 import QuizDashboard from './pages/QuizDashboard';
@@ -20,10 +21,10 @@ const Navbar: React.FC = () => {
 
   return (
     <nav style={{ background: '#0066cc', padding: '1rem 2rem', display: 'flex', gap: '2rem', alignItems: 'center' }}>
-      <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>Student Learning Portal</span>
+      <Link to="/" style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem', textDecoration: 'none' }}>Student Learning Portal</Link>
       {fullName && (
         <>
-          <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Courses</Link>
+          <Link to="/courses" style={{ color: 'white', textDecoration: 'none' }}>Courses</Link>
           <Link to="/progress" style={{ color: 'white', textDecoration: 'none' }}>Progress</Link>
           <Link to="/quizzes" style={{ color: 'white', textDecoration: 'none' }}>Quiz Results</Link>
           {isAdmin && <Link to="/admin" style={{ color: 'white', textDecoration: 'none' }}>Admin</Link>}
@@ -58,7 +59,8 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
         <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
         <Route path="/quizzes" element={<ProtectedRoute><QuizDashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />

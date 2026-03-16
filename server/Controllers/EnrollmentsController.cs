@@ -20,8 +20,15 @@ public class EnrollmentsController : ControllerBase
     public async Task<IActionResult> GetByStudent(int studentId)
     {
         var enrollments = await _context.Enrollments
-            .Include(e => e.Course)
             .Where(e => e.StudentId == studentId)
+            .Select(e => new {
+                e.Id,
+                e.StudentId,
+                e.CourseId,
+                e.LessonsCompleted,
+                e.IsCompleted,
+                e.EnrolledAt
+            })
             .ToListAsync();
         return Ok(enrollments);
     }
@@ -35,7 +42,26 @@ public class EnrollmentsController : ControllerBase
 
         _context.Enrollments.Add(enrollment);
         await _context.SaveChangesAsync();
-        return Ok(enrollment);
+        return Ok(new {
+            enrollment.Id,
+            enrollment.StudentId,
+            enrollment.CourseId,
+            enrollment.LessonsCompleted,
+            enrollment.IsCompleted,
+            enrollment.EnrolledAt
+        });
+    }
+
+    [HttpDelete("{studentId}/{courseId}")]
+    public async Task<IActionResult> Unenroll(int studentId, int courseId)
+    {
+        var enrollment = await _context.Enrollments
+            .FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);
+        if (enrollment == null) return NotFound("Enrollment not found.");
+
+        _context.Enrollments.Remove(enrollment);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Unenrolled successfully." });
     }
 
     [HttpPut("{id}/progress")]
@@ -51,6 +77,13 @@ public class EnrollmentsController : ControllerBase
         enrollment.IsCompleted = lessonsCompleted >= course.TotalLessons;
 
         await _context.SaveChangesAsync();
-        return Ok(enrollment);
+        return Ok(new {
+            enrollment.Id,
+            enrollment.StudentId,
+            enrollment.CourseId,
+            enrollment.LessonsCompleted,
+            enrollment.IsCompleted,
+            enrollment.EnrolledAt
+        });
     }
 }

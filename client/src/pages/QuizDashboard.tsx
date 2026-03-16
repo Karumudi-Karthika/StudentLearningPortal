@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 
 interface QuizResult {
@@ -12,20 +12,19 @@ interface QuizResult {
 }
 
 const QuizDashboard: React.FC = () => {
-  const [studentId, setStudentId] = useState('');
   const [results, setResults] = useState<QuizResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchResults = () => {
+  const studentId = localStorage.getItem('studentId');
+
+  useEffect(() => {
     if (!studentId) return;
-    setLoading(true);
-    setError('');
     api.get(`/Quizzes/results/${studentId}`)
       .then(res => setResults(res.data))
-      .catch(() => setError('No results found for this student.'))
+      .catch(() => setError('No results found.'))
       .finally(() => setLoading(false));
-  };
+  }, [studentId]);
 
   const getScoreColor = (percentage: number) => {
     if (percentage >= 80) return '#28a745';
@@ -39,32 +38,17 @@ const QuizDashboard: React.FC = () => {
     return { bg: '#f8d7da', color: '#721c24', label: 'Needs Work' };
   };
 
+  if (loading) return <p style={{ padding: '2rem' }}>Loading results...</p>;
+
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Quiz Results Dashboard</h1>
+      <h1>My Quiz Results</h1>
 
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', marginBottom: '2rem' }}>
-        <input
-          type="number"
-          placeholder="Enter Student ID"
-          value={studentId}
-          onChange={e => setStudentId(e.target.value)}
-          style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ccc', fontSize: '1rem' }}
-        />
-        <button
-          onClick={fetchResults}
-          style={{ padding: '0.5rem 1.5rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
-        >
-          Load Results
-        </button>
-      </div>
-
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      {results.length > 0 && (
+      {error || results.length === 0 ? (
+        <p style={{ color: '#666', marginTop: '1rem' }}>No quiz results yet.</p>
+      ) : (
         <>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', marginBottom: '2rem' }}>
             <div style={{ flex: 1, background: '#f0f4ff', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
               <p style={{ fontSize: '0.85rem', color: '#666' }}>Total Quizzes</p>
               <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#0066cc' }}>{results.length}</p>
@@ -102,9 +86,7 @@ const QuizDashboard: React.FC = () => {
                       <div style={{
                         width: `${r.percentage}%`,
                         background: getScoreColor(r.percentage),
-                        height: '10px',
-                        borderRadius: '999px',
-                        transition: 'width 0.4s ease'
+                        height: '10px', borderRadius: '999px', transition: 'width 0.4s ease'
                       }} />
                     </div>
                     <span style={{ fontSize: '0.9rem', fontWeight: 'bold', minWidth: '80px' }}>
