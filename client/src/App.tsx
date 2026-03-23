@@ -9,12 +9,14 @@ import QuizPage from './pages/QuizPage';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const fullName = localStorage.getItem('fullName');
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const initials = fullName ? fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '';
 
   const handleLogout = () => {
     localStorage.clear();
@@ -35,7 +37,16 @@ const Navbar: React.FC = () => {
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {fullName ? (
           <>
-            <span style={{ color: 'white', fontSize: '0.9rem' }}>Hi, {fullName}</span>
+            <Link to="/profile" style={{ textDecoration: 'none' }}>
+              <div style={{
+                width: '34px', height: '34px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.25)', color: 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer'
+              }}>
+                {initials}
+              </div>
+            </Link>
             <button
               onClick={handleLogout}
               style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', padding: '0.4rem 1rem', borderRadius: '6px', cursor: 'pointer' }}
@@ -68,6 +79,7 @@ const App: React.FC = () => {
         <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
         <Route path="/quizzes" element={<ProtectedRoute><QuizDashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

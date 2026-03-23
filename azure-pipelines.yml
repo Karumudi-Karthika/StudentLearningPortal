@@ -1,0 +1,57 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+
+- stage: BuildFrontend
+  displayName: 'Build React Frontend'
+  jobs:
+  - job: ReactBuild
+    displayName: 'Install and Build'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Use Node.js 20'
+
+    - script: |
+        cd client
+        npm install
+        npm run build
+      displayName: 'npm install and build'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'client/build'
+        ArtifactName: 'react-build'
+      displayName: 'Publish React build artifacts'
+
+- stage: BuildBackend
+  displayName: 'Build .NET Backend'
+  dependsOn: BuildFrontend
+  jobs:
+  - job: DotnetBuild
+    displayName: 'Restore, Build and Test'
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '10.x'
+      displayName: 'Use .NET 10 SDK'
+
+    - script: |
+        cd server
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+      displayName: 'dotnet restore and build'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'server/bin/Release'
+        ArtifactName: 'dotnet-build'
+      displayName: 'Publish .NET build artifacts'
