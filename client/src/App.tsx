@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import CertificatePage from './pages/CertificatePage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const Navbar: React.FC = () => {
@@ -32,6 +33,7 @@ const Navbar: React.FC = () => {
           <Link to="/courses" style={{ color: 'white', textDecoration: 'none' }}>Courses</Link>
           <Link to="/progress" style={{ color: 'white', textDecoration: 'none' }}>Progress</Link>
           <Link to="/quizzes" style={{ color: 'white', textDecoration: 'none' }}>Quiz Results</Link>
+          <Link to="/leaderboard" style={{ color: 'white', textDecoration: 'none' }}>🏆 Leaderboard</Link>
           {isAdmin && <Link to="/admin" style={{ color: 'white', textDecoration: 'none' }}>Admin</Link>}
         </>
       )}
@@ -80,6 +82,7 @@ const App: React.FC = () => {
         <Route path="/certificate/:courseId" element={<ProtectedRoute><CertificatePage /></ProtectedRoute>} />
         <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
         <Route path="/quizzes" element={<ProtectedRoute><QuizDashboard /></ProtectedRoute>} />
+        <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       </Routes>
