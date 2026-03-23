@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import CertificatePage from './pages/CertificatePage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const Navbar: React.FC = () => {
@@ -76,6 +77,7 @@ const App: React.FC = () => {
         <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
         <Route path="/courses/:courseId" element={<ProtectedRoute><CourseDetailPage /></ProtectedRoute>} />
         <Route path="/quiz/:quizId" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+        <Route path="/certificate/:courseId" element={<ProtectedRoute><CertificatePage /></ProtectedRoute>} />
         <Route path="/progress" element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
         <Route path="/quizzes" element={<ProtectedRoute><QuizDashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />

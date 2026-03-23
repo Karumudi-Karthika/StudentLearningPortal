@@ -35,6 +35,7 @@ const CourseDetailPage: React.FC = () => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCompletion, setShowCompletion] = useState(false);
   const { toast, showToast, hideToast } = useToast();
 
   const studentId = localStorage.getItem('studentId');
@@ -49,6 +50,7 @@ const CourseDetailPage: React.FC = () => {
       setLessons(lessonsRes.data);
       const found = enrollmentsRes.data.find((e: Enrollment) => e.courseId === parseInt(courseId));
       setEnrollment(found || null);
+      if (found?.isCompleted) setShowCompletion(true);
       if (lessonsRes.data.length > 0) setActiveLesson(lessonsRes.data[0]);
       const courseQuizzes = quizzesRes.data.filter((q: Quiz) => q.courseId === parseInt(courseId));
       setQuizzes(courseQuizzes);
@@ -65,25 +67,20 @@ const CourseDetailPage: React.FC = () => {
         { headers: { 'Content-Type': 'application/json' } }
       );
       setEnrollment(res.data);
-      showToast('Lesson marked as complete!', 'success');
-      const nextLesson = lessons.find(l => l.order === activeLesson.order + 1);
-      if (nextLesson) {
-        setActiveLesson(nextLesson);
+      if (res.data.isCompleted) {
+        setShowCompletion(true);
       } else {
-        showToast('Congratulations! You have completed this course! 🎉', 'success');
+        showToast('Lesson marked as complete!', 'success');
+        const nextLesson = lessons.find(l => l.order === activeLesson.order + 1);
+        if (nextLesson) setActiveLesson(nextLesson);
       }
     } catch {
       showToast('Failed to update progress.', 'error');
     }
   };
 
-  const isLessonCompleted = (lesson: Lesson) => {
-    return enrollment ? lesson.order <= enrollment.lessonsCompleted : false;
-  };
-
-  const isLessonLocked = (lesson: Lesson) => {
-    return enrollment ? lesson.order > enrollment.lessonsCompleted + 1 : true;
-  };
+  const isLessonCompleted = (lesson: Lesson) => enrollment ? lesson.order <= enrollment.lessonsCompleted : false;
+  const isLessonLocked = (lesson: Lesson) => enrollment ? lesson.order > enrollment.lessonsCompleted + 1 : true;
 
   if (loading) return <p style={{ padding: '2rem' }}>Loading course...</p>;
   if (!enrollment) return (
@@ -94,6 +91,49 @@ const CourseDetailPage: React.FC = () => {
       </button>
     </div>
   );
+
+  // Course completion screen
+  if (showCompletion) {
+    return (
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+          <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: '#155724' }}>Course Completed!</h1>
+          <p style={{ color: '#666', fontSize: '1rem', marginBottom: '2rem' }}>
+            Congratulations! You have completed all {lessons.length} lessons.
+          </p>
+          {quizzes.length > 0 && (
+            <div style={{ background: '#f0fff4', border: '1px solid #c3e6cb', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#155724', fontWeight: 'bold', marginBottom: '1rem' }}>Ready to test your knowledge?</p>
+              {quizzes.map(quiz => (
+                <button
+                  key={quiz.id}
+                  onClick={() => navigate(`/quiz/${quiz.id}`)}
+                  style={{ width: '100%', padding: '0.75rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem', marginBottom: '0.5rem' }}
+                >
+                  Take {quiz.title} →
+                </button>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button
+              onClick={() => setShowCompletion(false)}
+              style={{ padding: '0.75rem 1.5rem', background: 'white', color: '#0066cc', border: '1px solid #0066cc', borderRadius: '6px', cursor: 'pointer' }}
+            >
+              Review Lessons
+            </button>
+            <button
+              onClick={() => navigate('/courses')}
+              style={{ padding: '0.75rem 1.5rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+            >
+              Browse More Courses
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
@@ -145,7 +185,7 @@ const CourseDetailPage: React.FC = () => {
             {quizzes.map(quiz => (
               <button
                 key={quiz.id}
-                onClick={() => navigate(`/quiz/${quiz.id}`)}
+                onClick={() => enrollment.isCompleted && navigate(`/quiz/${quiz.id}`)}
                 style={{
                   width: '100%', padding: '0.75rem', marginBottom: '0.5rem',
                   background: enrollment.isCompleted ? '#0066cc' : '#f0f0f0',
@@ -165,6 +205,15 @@ const CourseDetailPage: React.FC = () => {
             )}
           </div>
         )}
+
+        {enrollment.isCompleted && (
+          <button
+            onClick={() => setShowCompletion(true)}
+            style={{ marginTop: '1rem', width: '100%', padding: '0.6rem', background: '#155724', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+          >
+            🎉 View Completion
+          </button>
+        )}
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '2rem' }}>
@@ -181,11 +230,9 @@ const CourseDetailPage: React.FC = () => {
                 </span>
               )}
             </div>
-
             <div style={{ background: '#f9f9f9', borderRadius: '8px', padding: '2rem', marginBottom: '2rem', lineHeight: '1.8', fontSize: '1rem', color: '#333' }}>
               {activeLesson.content}
             </div>
-
             <div style={{ display: 'flex', gap: '1rem' }}>
               {!isLessonCompleted(activeLesson) && (
                 <button

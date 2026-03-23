@@ -15,6 +15,7 @@ interface Question {
 
 interface QuizInfo {
   id: number;
+  courseId: number;
   title: string;
   totalMarks: number;
 }
@@ -106,7 +107,7 @@ const QuizPage: React.FC = () => {
   if (result) {
     return (
       <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
-        <div style={{ background: getScoreBg(result.percentage), border: `1px solid`, borderRadius: '12px', padding: '2rem', textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ background: getScoreBg(result.percentage), borderRadius: '12px', padding: '2rem', textAlign: 'center', marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.5rem', color: getScoreColor(result.percentage), marginBottom: '0.5rem' }}>
             {result.percentage >= 80 ? '🎉 Excellent!' : result.percentage >= 50 ? '👍 Good effort!' : '📚 Keep studying!'}
           </h1>
@@ -117,19 +118,29 @@ const QuizPage: React.FC = () => {
             {result.score} / {result.totalMarks} marks — {result.correct} of {result.total} correct
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button
-            onClick={() => navigate('/quizzes')}
-            style={{ flex: 1, padding: '0.75rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
-          >
-            View All Results
-          </button>
-          <button
-            onClick={() => navigate('/courses')}
-            style={{ flex: 1, padding: '0.75rem', background: 'white', color: '#0066cc', border: '1px solid #0066cc', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
-          >
-            Back to Courses
-          </button>
+        <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+          {quiz.courseId && (
+            <button
+              onClick={() => navigate(`/certificate/${quiz.courseId}`)}
+              style={{ width: '100%', padding: '0.85rem', background: '#155724', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}
+            >
+              🎓 View My Certificate
+            </button>
+          )}
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              onClick={() => navigate('/quizzes')}
+              style={{ flex: 1, padding: '0.75rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
+            >
+              View All Results
+            </button>
+            <button
+              onClick={() => navigate('/courses')}
+              style={{ flex: 1, padding: '0.75rem', background: 'white', color: '#0066cc', border: '1px solid #0066cc', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}
+            >
+              Back to Courses
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -164,14 +175,10 @@ const QuizPage: React.FC = () => {
               key={opt}
               onClick={() => handleAnswer(currentQuestion.id, opt)}
               style={{
-                padding: '0.85rem 1rem',
-                borderRadius: '6px',
+                padding: '0.85rem 1rem', borderRadius: '6px',
                 border: answers[currentQuestion.id] === opt ? '2px solid #0066cc' : '1px solid #ddd',
                 background: answers[currentQuestion.id] === opt ? '#e8f0fe' : 'white',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem',
                 transition: 'all 0.15s ease'
               }}
             >
