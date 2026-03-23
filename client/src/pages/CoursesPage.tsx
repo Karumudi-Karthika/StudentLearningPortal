@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Course } from '../types';
 import Toast from '../components/Toast';
@@ -13,6 +14,7 @@ const CoursesPage: React.FC = () => {
   const [unenrolling, setUnenrolling] = useState<number | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const { toast, showToast, hideToast } = useToast();
+  const navigate = useNavigate();
 
   const studentId = localStorage.getItem('studentId');
 
@@ -115,10 +117,10 @@ const CoursesPage: React.FC = () => {
                   ) : (
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
-                        disabled
-                        style={{ flex: 2, padding: '0.6rem', background: '#e0e0e0', color: '#888', border: 'none', borderRadius: '6px', fontSize: '0.95rem' }}
+                        onClick={() => navigate(`/courses/${course.id}`)}
+                        style={{ flex: 2, padding: '0.6rem', background: '#0066cc', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.95rem' }}
                       >
-                        Enrolled ✓
+                        Start Course →
                       </button>
                       <button
                         onClick={() => setConfirmId(course.id)}

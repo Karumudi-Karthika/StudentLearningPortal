@@ -20,7 +20,12 @@ public class QuizzesController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var quizzes = await _context.Quizzes
-            .Include(q => q.Course)
+            .Select(q => new {
+                q.Id,
+                q.CourseId,
+                q.Title,
+                q.TotalMarks
+            })
             .ToListAsync();
         return Ok(quizzes);
     }
@@ -30,7 +35,7 @@ public class QuizzesController : ControllerBase
     {
         _context.Quizzes.Add(quiz);
         await _context.SaveChangesAsync();
-        return Ok(quiz);
+        return Ok(new { quiz.Id, quiz.CourseId, quiz.Title, quiz.TotalMarks });
     }
 
     [HttpPost("results")]
@@ -38,7 +43,7 @@ public class QuizzesController : ControllerBase
     {
         _context.QuizResults.Add(result);
         await _context.SaveChangesAsync();
-        return Ok(result);
+        return Ok(new { result.Id, result.StudentId, result.QuizId, result.Score, result.TakenAt });
     }
 
     [HttpGet("results/{studentId}")]

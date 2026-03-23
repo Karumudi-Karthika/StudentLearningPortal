@@ -50,7 +50,7 @@ const QuizDashboard: React.FC = () => {
         <>
           <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', marginBottom: '2rem' }}>
             <div style={{ flex: 1, background: '#f0f4ff', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.85rem', color: '#666' }}>Total Quizzes</p>
+              <p style={{ fontSize: '0.85rem', color: '#666' }}>Total Attempts</p>
               <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#0066cc' }}>{results.length}</p>
             </div>
             <div style={{ flex: 1, background: '#f0fff4', borderRadius: '8px', padding: '1rem', textAlign: 'center' }}>
@@ -68,16 +68,16 @@ const QuizDashboard: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {results.map(r => {
+            {results.map((r, index) => {
               const badge = getScoreBadge(r.percentage);
               return (
-                <div key={r.quizId} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1.5rem' }}>
+                <div key={index} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <div>
                       <h2 style={{ fontSize: '1.1rem', marginBottom: '0.2rem' }}>{r.quizTitle}</h2>
                       <p style={{ fontSize: '0.85rem', color: '#666' }}>{r.courseTitle}</p>
                     </div>
-                    <span style={{ background: badge.bg, color: badge.color, padding: '2px 12px', borderRadius: '12px', fontSize: '0.85rem', height: 'fit-content' }}>
+                    <span style={{ background: badge.bg, color: badge.color, padding: '2px 12px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 'bold', height: 'fit-content' }}>
                       {badge.label}
                     </span>
                   </div>

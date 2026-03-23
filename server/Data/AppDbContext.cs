@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<Quiz> Quizzes => Set<Quiz>();
     public DbSet<QuizResult> QuizResults => Set<QuizResult>();
+    public DbSet<Lesson> Lessons => Set<Lesson>();
+    public DbSet<Question> Questions => Set<Question>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +35,18 @@ public class AppDbContext : DbContext
             .HasOne(qr => qr.Quiz)
             .WithMany(q => q.Results)
             .HasForeignKey(qr => qr.QuizId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Lesson>()
+            .HasOne(l => l.Course)
+            .WithMany()
+            .HasForeignKey(l => l.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Question>()
+            .HasOne(q => q.Quiz)
+            .WithMany()
+            .HasForeignKey(q => q.QuizId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
